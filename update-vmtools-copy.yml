@@ -1,0 +1,23 @@
+# update-vmtools.yml
+
+---
+- hosts: windows
+  tasks:
+  - name: Copy File
+    win_copy:
+      src: \\server\share\setup64.exe
+      dest: c:\TEMP\
+      remote_src: yes
+      state: present
+    become: true
+    become_method: runas
+    become_flags: logon_type=new_credentials logon_flags=netcredentials_only
+    vars:
+      ansible_become_user: user@DOMAIN.LOCAL
+      ansible_become_pass: dummypassword
+
+  - name: Install VMware Tools
+    win_package:
+      path: c:\TEMP\setup64.exe
+      arguments: /s /v "/qn REBOOT=R" /l C:\Temp\VMwareToolsInstall.log
+      state: present
